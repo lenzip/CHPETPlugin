@@ -1,0 +1,23 @@
+# Set particle generator
+/GGS/genType gun
+/GGS/gun/particle e-
+/GGS/gun/position 0. 0. 30. cm
+/GGS/gun/minTheta 0 deg
+/GGS/gun/maxTheta 30 deg
+/GGS/gun/minPhi 0 deg
+/GGS/gun/maxPhi 360 deg
+/GGS/gun/energy 10 GeV
+/GGS/gun/checkAcceptance true #Turn on the acceptance check
+
+# Add sensitive detectors
+/GGS/scoring/addGGSIntHitSD cube1Logic
+/GGS/scoring/cube1Logic.GGSIntHitSD/storeParticleHits # Turn on storage of particle hits for small cube 
+/GGS/scoring/addGGSIntHitSD cube2Logic
+
+# Add user actions
+/GGS/userActions/addGGSMCTruthAction
+/GGS/userActions/addGGSHitsAction
+
+# Shoot 100 particles
+/run/beamOn 1000
+

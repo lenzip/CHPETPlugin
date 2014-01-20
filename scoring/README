@@ -1,0 +1,49 @@
+***********************
+* GGS SCORING EXAMPLE *
+***********************
+
+In this example a simple sensitive detector is created, together with a user action which saves the scoring informations 
+on a text file.
+
+The SDScoringExample sensitive detector class computes the total energy release in each physical volume associated to the
+logical volume to which the SD is attached. The SD can be assigned to a logical volume with the command:
+
+   /GGS/scoring/addSDScoringExample <logVolName>
+
+where <logVolName> is the name of the logical volume passed as command argument. A datacard command:
+
+   /GGS/examples/scoring/SDScoringExample/<LogVolName>/onlyNeutral
+    
+will then become available and can be used to register only the energy deposited by neutral particles for the specified
+volume. Notice the usage of the RegisterSD macro in SDScoringExample.cpp in order to make the SD assignment command
+available after loading the plugin library. The SD will create a hit collection named "<logVolName>.SDScoringExample" in
+order to not being confused with other hit collections created by eventual other SD for the same volume.
+
+The energy releases are stored in instances of the HitScoringExample class, a child of G4VHit. Each object have a field
+to record the name of the physical volume and a field for its associated energy release. The UAScoringExample user action
+process the hits at the end of each event and dumps them on the text file. Notice how in EndOfEventAction it checks for the
+presence of the ".SDScoringExample" string in the names of the hit collections, in order to identify the hits produced
+by the SDScoringExample sensitive detector class. Like all the GGS user actions, it is not built by default and must be
+created at runtime with the command:
+
+   /GGS/userActions/addUAScoringExample
+   
+After this, it will be possible to change the name of the output file with:
+
+   /GGS/examples/scoring/UAScoringExample/outFileName
+  
+All the classes in this examples will be put into a single library called libScoringExample.so, which must be loaded using
+the -ua command line options of GGSPenny.
+
++++++++++
++ BUILD +
++++++++++
+
+This example comes with its own CMakeLists.txt and can be independently built. To build it, follow these instructions:
+
+- create a build directory wherever you prefer, with any name
+- cd to the build directory
+- cmake /path/to/GGSSSoftware/examples/geometry
+- make all
+
+Inside the build directory, the example scoring library (libScoringExample.so) can now be found.

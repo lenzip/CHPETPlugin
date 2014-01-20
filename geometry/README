@@ -1,0 +1,34 @@
+************************
+* GGS GEOMETRY EXAMPLE *
+************************
+
+This example shows how to create a simple Geant4 geometry and pack it into a GGS plugin geometry library. The geometry
+consists of two cubes aligned along the Z axis, with the face of the first cube at Z=0 and the second cube placed in the Z<0
+region. The first cube is made of PVT while the second one of BGO; they are put in a world volume filled by air. GGS materials
+have been used.
+
+The geometry parameters can be tuned using the following geometry datacard commands:
+
+   /GGS/examples/geometry/GeoExample/size1
+   /GGS/examples/geometry/GeoExample/size2
+   /GGS/examples/geometry/GeoExample/distance
+
+They set the size of cube 1, of cube 2, and the distance between the faces of the two cubes, respectively. The default values for
+these parameters are 5, 20 and 10 cm, respectively.
+
+The geometry implements an acceptance check routine in the GeoExample::IsInsideAcceptance method. The instrument acceptance
+is simply defined by the face of the first cube at Z=0 for particles shot from the Z>0 region and traveling towards Z<0.
+
+
++++++++++
++ BUILD +
++++++++++
+
+This example comes with its own CMakeLists.txt and can be independently built. To build it, follow these instructions:
+
+- create a build directory wherever you prefer, with any name
+- cd to the build directory
+- cmake /path/to/GGSSSoftware/examples/geometry
+- make all
+
+Inside the build directory, the example geometry library (libGeoExample.so) can now be found.

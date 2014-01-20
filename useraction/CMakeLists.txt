@@ -1,0 +1,6 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+PROJECT(UserActionExample)
+
+FIND_PACKAGE(GGS REQUIRED)
+
+ADD_LIBRARY(UserActionExample SHARED src/UserActionExample.cpp)

@@ -1,0 +1,39 @@
+***************************
+* GGS USER ACTION EXAMPLE *
+***************************
+
+This example shows how to create a simple GGS user action which dumps the number of particles produced in each event
+on a text file. In the constructor of the UserActionExample class a messenger is created to set the name of the output file
+using the command:
+
+   /GGS/examples/useraction/UserActionExample/outFileName
+
+The default name of the output file is UserActionExample.txt.
+
+The UserActionExample::BeginOfRunAction initializes the header of the output file. At the end of each event the number
+of particles is dumped on the file by the UserActionExample::EndOfEventAction method. Finally, when the run ends, the method
+UserActionExample::EndOfRunAction will close the output file. The destructor will delete the messenger.
+
+In UserActionExample.cpp, notice the usage of the macro RegisterUA: this macro, taking as argument the name of the class, is 
+required in order to create a plugin library with a user action class that can be created at runtime as explained in the 
+following.   
+
+The action can be used with GGSPenny by loading its library with the -ua command line option for GGSPenny. Like all the other
+GGS user actions, it is not built by default, so the user has to create it with the datacard command:
+
+   /GGS/userActions/addUserActionExample
+
+The creation command must be issued before the file name setting command.
+
++++++++++
++ BUILD +
++++++++++
+
+This example comes with its own CMakeLists.txt and can be independently built. To build it, follow these instructions:
+
+- create a build directory wherever you prefer, with any name
+- cd to the build directory
+- cmake /path/to/GGSSSoftware/examples/geometry
+- make all
+
+Inside the build directory, the example user action library (libUserActionExample.so) can now be found.

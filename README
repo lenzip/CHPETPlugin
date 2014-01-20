@@ -1,0 +1,43 @@
+****************
+* GGS EXAMPLES *
+****************
+
+This folder contains various examples of GGS usage. Each of them can be built separately and illustrate a feature of GGS.
+Available examples:
+
+geometry
+--------
+    This example shows how to create a plugin geometry for GGS, including a messenger for geometry configuration
+    and an acceptance check routine to be used with the GGS gun event generator.
+    
+useraction
+----------
+    An example of definition of a plugin user action.
+    
+scoring
+-------
+    In this example, a sensitive detector and a user action for data persistency are implemented and packed into a
+    single user action.
+    
+analysis
+--------
+    An example about how to run a simulation and analyze the produced data with a ROOT script. Requires the geometry
+    defined in the geometry example.
+    
+    
+Please refer to the README file inside each directory for more information about a specific example.
+
++++++++++
++ BUILD +
++++++++++
+
+Each example (except analysis) comes with its own CMakeLists.txt and can be independently built. To build all the examples
+at once use the CMakeLists.txt in this folder and follow these instructions:
+
+- create a build directory wherever you prefer, with any name
+- cd to the build directory
+- cmake /path/to/GGSSSoftware/examples
+- make all
+
+Inside the build directory, a "geometry" folder containing the example geometry library (libGeoExample.so) can now be found, 
+and similarly for other examples.

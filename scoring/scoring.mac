@@ -1,0 +1,17 @@
+# Configure the particle generator
+/GGS/genType gun             # Create the GGS gun generator
+/GGS/gun/particle e+         # Set particle to positron
+/GGS/gun/energy 10 GeV       # Set the positron energy
+/GGS/gun/position 0 0 20 cm  # Set the shooting point on the Z axis at Z=20 cm. Default shooting direction is towards negative Z
+
+# Set the sensitive detectors
+/GGS/scoring/addSDScoringExample cube1Logic                                           # Add SD to the small cube
+/GGS/scoring/addSDScoringExample cube2Logic                                           # Add SD to the big cube
+/GGS/examples/scoring/SDScoringExample/cube2Logic.SDScoringExample/onlyNeutral true   # Set the 2nd SD to record only energy deposit from neutral particles
+
+# Create the user action for data persistency
+/GGS/userActions/addUAScoringExample                                      # Create the user action which will care about persistency
+/GGS/examples/scoring/UAScoringExample/outFileName ScoringExampleOut.txt  # Set the name of the output file (optional)
+
+# Shoot 10 particles
+/run/beamOn 10
