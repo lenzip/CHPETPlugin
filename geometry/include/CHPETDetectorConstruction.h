@@ -32,18 +32,6 @@ class CHPETDetectorConstruction : public GGSVGeometryConstruction
     G4LogicalVolume* buildPD(); 
 
     G4VPhysicalVolume * _Physical_World;
-    G4double _sizeX, _sizeY, _sizeZ;
-    G4int _detectorside;
-    G4double _scintillationYield;
-    G4double _Diode_Size_X;
-    G4double _Diode_Size_Y;
-    G4double _Diode_Size_Z;
-    G4double _Resin_Size_X;
-    G4double _Resin_Size_Y;
-    G4double _Resin_Size_Z;
-    G4double _Case_Size_X;
-    G4double _Case_Size_Y;
-    G4double _Case_Size_Z;
 
     G4PVPlacement * _Physical_Diode ;
     G4PVPlacement * _Physical_Resin ;
