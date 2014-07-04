@@ -65,6 +65,7 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
   G4Material * lead = man->FindOrBuildMaterial("G4_Pb");
   G4Material * SiO2 = man->FindOrBuildMaterial("G4_SILICON_DIOXIDE");
   density = 2.203*g/cm3;
+
 // Silicon
 // 
   G4Material * SiliconMaterial = new G4Material("SiliconMaterial", z=14, 
@@ -80,6 +81,21 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
 //
   G4Material * CeramicMaterial = new G4Material("ResinMaterial", z=6, a=12*g/mole, 
 					     density=2*g/cm3);
+//lead glass
+  G4Material * PbO  = man->FindOrBuildMaterial("G4_LEAD_OXIDE");
+  G4Material * K2O  = man->FindOrBuildMaterial("G4_POTASSIUM_IODIDE");
+  G4Material * Na2O = man->FindOrBuildMaterial("G4_SODIUM_MONOXIDE");
+  density = 4.06*g/cm3;
+  /*
+  G4Material * Lead_Glass = new G4Material("LEAD_GLASS_CEREN25", density, nelements=4);
+  Lead_Glass->AddMaterial(SiO2,fraction=0.39);
+  Lead_Glass->AddMaterial(PbO,fraction=0.55);
+  Lead_Glass->AddMaterial(K2O,fraction=0.03);
+  Lead_Glass->AddMaterial(Na2O,fraction=0.03); 
+  */
+  G4Material * Lead_Glass = new G4Material("LEAD_GLASS_CEREN25", density, nelements=2);
+  Lead_Glass->AddMaterial(SiO2,fraction=0.70);
+  Lead_Glass->AddMaterial(PbO,fraction=0.30);
 
 //
 // ------------ Generate & Add Material Properties Table ------------
@@ -103,6 +119,7 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
   SiO2MPT->AddProperty("ABSLENGTH", energies_SiO2, absorption_SiO2, nEntries_SiO2);
 
   SiO2->SetMaterialPropertiesTable(SiO2MPT);
+  Lead_Glass->SetMaterialPropertiesTable(SiO2MPT);
 
   // Set the Birks Constant for the scintillator
   //Lead_Glass->GetIonisation()->SetBirksConstant(0.126*mm/MeV);
@@ -152,7 +169,7 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
 
   G4double _Resin_Size_X = _Cube_Size_X;
   G4double _Resin_Size_Y = _Cube_Size_Y;
-  G4double _Resin_Size_Z = 0.1*mm;
+  G4double _Resin_Size_Z = 2*mm;
 
   G4double abs_cub_gap = 0*cm;
 
@@ -168,12 +185,12 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
   // the detector box
   G4Box * _detectorBox = new  G4Box ("DetectorBox", (_Cube_Size_X)/2., (_Cube_Size_Y)/2., (_Cube_Size_Z+_Absorber_Size_Z+_Resin_Size_Z)/2.);
   G4LogicalVolume * _logicDetector = new G4LogicalVolume(_detectorBox, Air, "DetectorBox");
-  G4Box * _detectorBoxDetectorSide = new  G4Box ("DetectorBoxDetectorSide", _Cube_Size_X/2., _Cube_Size_Y/2., (_Cube_Size_Z+_Absorber_Size_Z)/2.);
+  G4Box * _detectorBoxDetectorSide = new  G4Box ("DetectorBoxDetectorSide", (_Cube_Size_X)/2., (_Cube_Size_Y)/2., (_Cube_Size_Z+_Absorber_Size_Z)/2.);
   G4LogicalVolume * _logicBoxDetectorSide = new G4LogicalVolume(_detectorBoxDetectorSide, Air, "DetectorBoxDetectorSide");
   G4Box * _detectorBoxSensorSide = new  G4Box ("DetectorBoxSensorSide", _Cube_Size_X/2., _Cube_Size_Y/2., _Resin_Size_Z/2.);
   G4LogicalVolume * _logicBoxSensorSide = new G4LogicalVolume(_detectorBoxSensorSide, Air, "SensorBoxSensorSide");
 
-  G4PVPlacement * placementBDS = new G4PVPlacement(0, G4ThreeVector(0, 0, -_Resin_Size_Z/2.), _logicBoxDetectorSide, "DetectorBoxDetectorSide", _logicDetector, false, 0);
+  G4PVPlacement * placementBDS = new G4PVPlacement(0, G4ThreeVector(0, 0, -(_Resin_Size_Z)/2.), _logicBoxDetectorSide, "DetectorBoxDetectorSide", _logicDetector, false, 0);
   G4PVPlacement * placementBSS = new G4PVPlacement(0, G4ThreeVector(0, 0, (_Cube_Size_Z+_Absorber_Size_Z)/2.), _logicBoxSensorSide, "SensorBoxSensorSide", _logicDetector, false, 0);
 
 
@@ -183,7 +200,7 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
   G4Box * _Solid_Cube = new G4Box("SiO2_Cube", _Cube_Size_X / 2.,
                                  _Cube_Size_Y / 2., _Cube_Size_Z / 2.);
 
-  G4LogicalVolume * _Logic_Cube  = new G4LogicalVolume(_Solid_Cube, SiO2,
+  G4LogicalVolume * _Logic_Cube  = new G4LogicalVolume(_Solid_Cube, Lead_Glass,//SiO2, !!!!!!!!!!!!!!!!!!!!!!!!!!!!PROVA
                                                       "SiO2_Cube");
 
   G4double cube_Z = (_Absorber_Size_Z/2 + abs_cub_gap);
@@ -195,13 +212,13 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
                                       cube_Z
                                       ),
                       _Logic_Cube , "SiO2_Cube", _logicBoxDetectorSide, false, 0);
-
-// The SiO2 cube
+/*
+// The Absorber 
 //      
   G4Box * _Solid_Absorber = new G4Box("Pb_Absorber", _Absorber_Size_X / 2.,
                                  _Absorber_Size_Y / 2., _Absorber_Size_Z / 2.);
 
-  G4LogicalVolume * _Logic_Absorber  = new G4LogicalVolume(_Solid_Absorber, lead,
+  G4LogicalVolume * _Logic_Absorber  = new G4LogicalVolume(_Solid_Absorber, Lead_Glass,
                                                       "Pb_Absorber");
 
   G4PVPlacement * _Physical_Absorber =
@@ -211,7 +228,7 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
                                       -_Cube_Size_Z/2.
                                       ),
                       _Logic_Absorber , "Pb_Absorber", _logicBoxDetectorSide, false, 0);  
-
+*/
   
 // Optical Resin
 
@@ -233,6 +250,46 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
 
 //Surfaces
 
+  //SiO2_Air surface
+  G4OpticalSurface * Op_SiO2_Surface = new G4OpticalSurface("SiO2_Surface");
+  Op_SiO2_Surface->SetType(dielectric_dielectric);
+  Op_SiO2_Surface->SetFinish(groundbackpainted);
+  Op_SiO2_Surface->SetModel(unified);
+  Op_SiO2_Surface->SetSigmaAlpha(0.);
+  Op_SiO2_Surface->SetPolish(1.);
+
+  G4LogicalBorderSurface * SiO2_Air_Surf =
+    new G4LogicalBorderSurface("SiO2_to_Air", _Physical_Cube,
+                               _Physical_World, Op_SiO2_Surface);
+
+  G4LogicalBorderSurface * Air_SiO2_Surf =
+     new G4LogicalBorderSurface("Air_to_SiO2", _Physical_World,
+                               _Physical_Cube, Op_SiO2_Surface);
+
+  const G4int num = 2;
+
+  G4double wavelenghts_resin[num] = {180.*nm, 436*nm};
+  G4double* Ephoton = wavelenghToEnergy(wavelenghts_resin, num);
+  G4double Reflectivity_SiO2[num] = {0., 0.};
+  G4double Efficiency_SiO2[num]   = {1., 1.};
+
+  G4double specularlobe_SiO2[num] = {1., 1.};
+  G4double specularspike_SiO2[num] = {0., 0.};
+  G4double backscatter_SiO2[num] = {0., 0.};
+
+  G4MaterialPropertiesTable *CubeSPT = new G4MaterialPropertiesTable();
+
+  CubeSPT->AddProperty("REFLECTIVITY", Ephoton, Reflectivity_SiO2, num);
+  CubeSPT->AddProperty("EFFICIENCY",   Ephoton, Efficiency_SiO2,   num);
+  CubeSPT->AddProperty("SPECULARLOBECONSTANT",
+                        Ephoton, specularlobe_SiO2, num);
+  CubeSPT->AddProperty("SPECULARSPIKECONSTANT",
+                        Ephoton, specularspike_SiO2, num);
+  CubeSPT->AddProperty("BACKSCATTERCONSTANT",
+                        Ephoton, backscatter_SiO2, num);
+
+  Op_SiO2_Surface->SetMaterialPropertiesTable(CubeSPT);
+
   // SiO2 - Resin Surface
   G4OpticalSurface * Op_Resin_Surface = new G4OpticalSurface("Resin_Surface");
   Op_Resin_Surface->SetType(dielectric_dielectric);
@@ -249,10 +306,10 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
      new G4LogicalBorderSurface("Resin_to_SiO2", _Physical_Resin,
                                _Physical_Cube, Op_Resin_Surface);
 
-  const G4int num = 2;
+  //const G4int num = 2;
 
-  G4double wavelenghts_resin[num] = {180.*nm, 436*nm};
-  G4double* Ephoton = wavelenghToEnergy(wavelenghts_resin, num);
+  //G4double wavelenghts_resin[num] = {180.*nm, 436*nm};
+  //G4double* Ephoton = wavelenghToEnergy(wavelenghts_resin, num);
   G4double Reflectivity_Resin[num] = {1., 1.};
   G4double Efficiency_Resin[num]   = {0., 0.};
 
@@ -272,13 +329,50 @@ G4VPhysicalVolume* CHPETDetectorConstruction::Construct()
                         Ephoton, backscatter_Resin, num);
 
   Op_Resin_Surface->SetMaterialPropertiesTable(resinSPT);
-                      
 
-  G4PVPlacement * _Physical_Detector = new G4PVPlacement(0, G4ThreeVector(0, 0, 20*cm), _logicDetector, "DetectorBox", _Logic_World, false, 0);  
+/*
+  //Resin Air surace
+  G4OpticalSurface * Op_Air_Surface = new G4OpticalSurface("Air_Surface");
+  Op_Resin_Surface->SetType(dielectric_dielectric);
+  Op_Resin_Surface->SetFinish(groundbackpainted);
+  Op_Resin_Surface->SetModel(unified);
+  Op_Resin_Surface->SetSigmaAlpha(0.);
+  Op_Resin_Surface->SetPolish(1.);
+
+  G4LogicalBorderSurface * Res_Air_Surf =
+    new G4LogicalBorderSurface("Air_to_Resin", _Physical_Resin,
+                               placementBSS, Op_Air_Surface);
+  G4LogicalBorderSurface * Air_Res_Surf =
+      new G4LogicalBorderSurface("Resin_to_Air", _Physical_World,
+                                     _Physical_Resin, Op_Air_Surface);
+  
+
+  G4double Reflectivity_Air[num] = {0., 0.};
+  G4double Efficiency_Air[num]   = {1., 1.};
+
+  G4double specularlobe_Air[num] = {1., 1.};
+  G4double specularspike_Air[num] = {0., 0.};
+  G4double backscatter_Air[num] = {0., 0.};
+
+  G4MaterialPropertiesTable *airSPT = new G4MaterialPropertiesTable();
+
+  airSPT->AddProperty("REFLECTIVITY", Ephoton, Reflectivity_Air, num);
+  airSPT->AddProperty("EFFICIENCY",   Ephoton, Efficiency_Air,   num);
+  airSPT->AddProperty("SPECULARLOBECONSTANT",
+                        Ephoton, specularlobe_Air, num);
+  airSPT->AddProperty("SPECULARSPIKECONSTANT",
+                        Ephoton, specularspike_Air, num);
+  airSPT->AddProperty("BACKSCATTERCONSTANT",
+                        Ephoton, backscatter_Air, num);
+
+  Op_Air_Surface->SetMaterialPropertiesTable(airSPT); 
+*/                      
+
 
   G4RotationMatrix * rotm = new G4RotationMatrix();
   rotm->rotateX(180*deg);
-  G4PVPlacement * _Physical_Detector2 = new G4PVPlacement(rotm, G4ThreeVector(0, 0, -20*cm), _logicDetector, "DetectorBox", _Logic_World, false, 0);
+  G4PVPlacement * _Physical_Detector2 = new G4PVPlacement(rotm, G4ThreeVector(0, 0, -20*cm), _logicDetector, "DetectorBox2", _Logic_World, false, 0);
+  G4PVPlacement * _Physical_Detector = new G4PVPlacement(0, G4ThreeVector(0, 0, 20*cm), _logicDetector, "DetectorBox1", _Logic_World, false, 0);  
 
 //always return the physical World
   return _Physical_World;
